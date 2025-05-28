@@ -8,22 +8,34 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #e0f7fa, #e0f2f1); }
-        header, footer { background: linear-gradient(90deg, #0288d1, #26c6da); }
+        body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #e0f7fa, #e0f2f1); margin: 0; padding: 0; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
-    <header class="shadow-lg p-4 flex justify-between items-center text-white">
-        <h1 class="text-3xl font-bold">Admin Panel - Request Management</h1>
-        <button onclick="location.href='index.html'" class="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">Back to Home</button>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-800 to-cyan-500 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-4 py-3">
+            <span class="text-lg sm:text-2xl font-bold">Admin Panel</span>
+            <button onclick="location.href='index.html'" class="bg-white text-blue-600 px-5 py-2 rounded-lg shadow hover:bg-blue-100 transition duration-300">Back to Home</button>
+        </div>
     </header>
 
+    <!-- Logo Section -->
+    <section class="flex justify-center mt-6">
+        <img src="images/digital_twin_logo.png" alt="Digital Twin Logo" class="w-32 sm:w-48 md:w-56">
+    </section>
+
+    <!-- Main Content -->
     <main class="p-8 max-w-7xl mx-auto flex-grow">
         <h2 class="text-2xl font-semibold text-center mb-8 text-blue-800">Received Project Requests</h2>
         <div id="requestsList" class="space-y-4"></div>
     </main>
 
-    <footer class="text-center p-4 text-white">© 2025 Digital Twin</footer>
+    <!-- Footer -->
+    <footer class="text-center p-4 text-white bg-gradient-to-r from-blue-800 to-cyan-500 text-sm sm:text-base">
+        © 2025 Digital Twin | All rights reserved.
+    </footer>
 
     <script>
         const staticRequests = [

@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Login 👤</title>
+    <title>Employee Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            background: linear-gradient(135deg, #e0f7fa, #e0f2f1);
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
+
     <!-- Header -->
-    <header class="shadow-lg p-6 flex justify-between items-center text-white bg-gradient-to-r from-blue-600 to-cyan-500">
-        <h1 class="text-3xl font-bold">Digital Twin 💿</h1>
-        <button onclick="location.href='index.html'" class="bg-white text-blue-600 px-5 py-2 rounded-lg shadow hover:bg-blue-100 transition duration-300">Back to Home</button>
+    <header class="bg-gradient-to-r from-blue-800 to-cyan-500 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-4 py-3">
+            <span class="text-lg sm:text-2xl font-bold">Digital Twin</span>
+            <button onclick="location.href='index.html'" class="bg-white text-blue-600 px-5 py-2 rounded-lg shadow hover:bg-blue-100 transition duration-300">Back to Home</button>
+        </div>
     </header>
 
+    <!-- Logo Section -->
+    <section class="flex justify-center mt-6">
+        <img src="images/digital_twin_logo.png" alt="Digital Twin Logo" class="w-32 sm:w-48 md:w-56">
+    </section>
+
     <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center">
+    <main class="flex-grow flex items-center justify-center px-4 py-8">
         <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
-            <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">👤 Employee Login</h2>
+            <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">👤 Employee Login</h2>
             <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-gray-700 font-medium">Username</label>
@@ -33,18 +43,21 @@
                     <label class="block text-gray-700 font-medium">Password</label>
                     <input type="password" placeholder="Enter your password" class="w-full p-3 border rounded-lg shadow focus:ring-2 focus:ring-blue-400" required>
                 </div>
-                <button type="submit" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg w-full text-lg shadow-lg transition duration-300">Login</button>
+                <button type="submit" class="bg-gradient-to-r from-blue-800 to-cyan-500 hover:from-blue-900 hover:to-cyan-600 text-white px-6 py-3 rounded-lg w-full text-lg shadow-lg transition duration-300">Login</button>
             </form>
         </div>
     </main>
 
-    <footer class="bg-gradient-to-r from-blue-600 to-cyan-500 text-center p-4 text-white w-full mt-auto">© 2025 Digital Twin</footer>
+    <!-- Footer -->
+    <footer class="text-center p-4 text-white bg-gradient-to-r from-blue-800 to-cyan-500 text-sm sm:text-base">
+        © 2025 Digital Twin | All rights reserved.
+    </footer>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             alert('✅ Login successful! Redirecting to the admin panel. (Dummy data)');
-            location.href='admin.html';
+            location.href = 'admin.html';
         });
     </script>
 </body>
