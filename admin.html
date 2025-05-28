@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Requests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #e0f7fa, #e0f2f1); }
+        header, footer { background: linear-gradient(90deg, #0288d1, #26c6da); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <header class="shadow-lg p-4 flex justify-between items-center text-white">
+        <h1 class="text-3xl font-bold">Admin Panel - Request Management</h1>
+        <button onclick="location.href='index.html'" class="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">Back to Home</button>
+    </header>
+
+    <main class="p-8 max-w-7xl mx-auto flex-grow">
+        <h2 class="text-2xl font-semibold text-center mb-8 text-blue-800">Received Project Requests</h2>
+        <div id="requestsList" class="space-y-4"></div>
+    </main>
+
+    <footer class="text-center p-4 text-white">© 2025 Digital Twin</footer>
+
+    <script>
+        const staticRequests = [
+            {
+                id: 'REQ-000',
+                name: 'Ahmed Al Omari',
+                email: 'Ahmad@gmail.com',
+                phone: '0551234567',
+                title: 'Digital Twin for Abdullah Bridge',
+                description: 'Creating a digital twin for King Abdullah Bridge for smart traffic management and structural monitoring.',
+                type: 'Infrastructure Management',
+                submittedAt: '28 May 2025, 04:38'
+            }
+        ];
+        const dynamicRequests = JSON.parse(localStorage.getItem('requests')) || [];
+        const allRequests = staticRequests.concat(dynamicRequests);
+
+        const requestsList = document.getElementById('requestsList');
+
+        if (allRequests.length === 0) {
+            requestsList.innerHTML = "<p class='text-center text-gray-600'>No requests found.</p>";
+        } else {
+            allRequests.forEach(req => {
+                const card = document.createElement('div');
+                card.className = 'bg-white shadow-md rounded-lg p-4';
+                card.innerHTML = `
+                    <h3 class="text-lg font-bold mb-2">${req.title}</h3>
+                    <p><strong>Ticket:</strong> ${req.id}</p>
+                    <p><strong>Name:</strong> ${req.name}</p>
+                    <p><strong>Email:</strong> ${req.email}</p>
+                    <p><strong>Phone:</strong> ${req.phone}</p>
+                    <p><strong>Description:</strong> ${req.description}</p>
+                    <p><strong>Type:</strong> ${req.type}</p>
+                    <p><strong>Submitted At:</strong> ${req.submittedAt}</p>
+                    <div class="mt-2 space-x-2">
+                        <button onclick="viewDetails('${req.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">View Details</button>
+                        <button id="accept-${req.id}" onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Accept</button>
+                        <button id="reject-${req.id}" onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Reject</button>
+                    </div>
+                    <div id="note-${req.id}" class="mt-2 p-2 rounded-lg hidden"></div>
+                `;
+                requestsList.appendChild(card);
+            });
+        }
+
+        function viewDetails(id) {
+            localStorage.setItem('selectedRequestId', id);
+            window.location.href = 'visual3d.html';
+        }
+
+        function acceptRequest(id) {
+            Swal.fire({ title: 'Accept Request', input: 'text', inputLabel: 'Approval Note (optional):', showCancelButton: true })
+                .then(result => {
+                    if (result.isConfirmed) {
+                        const note = result.value || 'Approved';
+                        Swal.fire('✅ Approved', note, 'success');
+                        const noteDiv = document.getElementById(`note-${id}`);
+                        noteDiv.textContent = `✔️ Approved: ${note}`;
+                        noteDiv.classList.remove('hidden');
+                        noteDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-400');
+                        document.getElementById(`reject-${id}`).disabled = true;
+                        document.getElementById(`reject-${id}`).classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                });
+        }
+
+        function rejectRequest(id) {
+            Swal.fire({ title: 'Reject Request', input: 'text', inputLabel: 'Reason for rejection:', showCancelButton: true })
+                .then(result => {
+                    if (result.isConfirmed) {
+                        const note = result.value || 'Rejected';
+                        Swal.fire('❌ Rejected', note, 'error');
+                        const noteDiv = document.getElementById(`note-${id}`);
+                        noteDiv.textContent = `❌ Rejected: ${note}`;
+                        noteDiv.classList.remove('hidden');
+                        noteDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-400');
+                        document.getElementById(`accept-${id}`).disabled = true;
+                        document.getElementById(`accept-${id}`).classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

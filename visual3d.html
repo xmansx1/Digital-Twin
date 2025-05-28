@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>King Abdullah Bridge 3D Visualization</title>
+    <style>
+        body { margin: 0; background: #e0f7fa; overflow: hidden; }
+        canvas { display: block; }
+        header, footer {
+            background: linear-gradient(to right, #007cf0, #00dfd8);
+            color: white; text-align: center; padding: 10px; font-family: 'Roboto', sans-serif;
+        }
+        #details {
+            position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 8px; max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <header>🌉 King Abdullah Bridge 3D Visualization</header>
+    <div id="threeCanvas"></div>
+    <div id="details">Loading project details...</div>
+    <footer>© 2025 Digital Twin</footer>
+
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three@0.150.0/build/three.module.js';
+        import { OrbitControls } from 'https://unpkg.com/three@0.150.0/examples/jsm/controls/OrbitControls.js';
+        import { GLTFLoader } from 'https://unpkg.com/three@0.150.0/examples/jsm/loaders/GLTFLoader.js';
+        import { RGBELoader } from 'https://unpkg.com/three@0.150.0/examples/jsm/loaders/RGBELoader.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById("threeCanvas").appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        const rgbeLoader = new RGBELoader();
+        rgbeLoader.load('textures/qwantani_noon_4k.exr', (texture) => {
+            texture.mapping = THREE.EquirectangularReflectionMapping;
+            scene.environment = texture;
+            scene.background = texture;
+        }, undefined, (err) => {
+            console.error('HDR loading error:', err);
+        });
+
+        const loader = new GLTFLoader();
+        loader.load('models/allplan_bridge.glb', (gltf) => {
+            console.log('✅ Model loaded');
+            gltf.scene.scale.set(0.1, 0.1, 0.1);
+            scene.add(gltf.scene);
+
+            const carCount = Math.floor(Math.random() * 5000);
+            if (carCount > 3000) {
+                gltf.scene.traverse((child) => { if (child.isMesh) child.material.color.set(0xff0000); });
+                alert('🚨 High traffic detected!');
+                let shake = 0;
+                const shakeCamera = () => {
+                    if (shake < 20) {
+                        camera.position.x += (Math.random() - 0.5) * 0.1;
+                        camera.position.y += (Math.random() - 0.5) * 0.1;
+                        shake++; requestAnimationFrame(shakeCamera);
+                    }
+                }; shakeCamera();
+            }
+        }, undefined, (error) => { console.error('GLB loading error:', error); });
+
+        camera.position.set(1, 1, 2);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+        animate();
+
+        const selectedId = localStorage.getItem('selectedRequestId');
+        const requests = {
+            'REQ-001': { name: 'Ahmed Al Omari', email: 'ahmad@gmail.com', phone: '0551234567', title: 'Digital Twin for Abdullah Bridge', description: '3D model for smart management.', type: 'Infrastructure Management' },
+            'REQ-002': { name: 'Sarah Mohammed', email: 'sarah@gmail.com', phone: '0559876543', title: 'Smart Building Management', description: 'Energy and maintenance tracking system.', type: 'Smart Solutions' }
+        };
+        const detailsDiv = document.getElementById('details');
+        if (selectedId && requests[selectedId]) {
+            const req = requests[selectedId];
+            detailsDiv.innerHTML = `<h3>${req.title}</h3><p><strong>Name:</strong> ${req.name}</p><p><strong>Email:</strong> ${req.email}</p><p><strong>Phone:</strong> ${req.phone}</p><p><strong>Description:</strong> ${req.description}</p><p><strong>Type:</strong> ${req.type}</p>`;
+        } else {
+            detailsDiv.textContent = 'No details available.';
+        }
+    </script>
+</body>
+</html>
