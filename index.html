@@ -13,34 +13,40 @@
             margin: 0;
             padding: 0;
         }
-        header {
-            background: linear-gradient(to right, #1e3a8a, #38bdf8);
-        }
-        nav a {
-            margin: 0 10px;
-            transition: color 0.3s;
-        }
-        nav a:hover {
-            color: #ffeb3b;
-        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
     <!-- Header -->
-    <header class="shadow-lg p-4 flex justify-between items-center text-white">
-        <h1 class="text-2xl sm:text-3xl font-bold">Digital Twin</h1>
-        <nav class="space-x-4">
-            <a href="#about" class="hover:underline">About</a>
-            <a href="#applications" class="hover:underline">Applications</a>
-            <a href="#contact" class="hover:underline">Contact</a>
-            <button onclick="location.href='login.html'" class="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition duration-300">Login</button>
-        </nav>
+    <header class="bg-gradient-to-r from-blue-800 to-cyan-500 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between px-4 py-3">
+            <div class="flex items-center space-x-2">
+                <span class="text-lg sm:text-2xl font-bold">Digital Twin</span>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#about" class="hover:underline">About</a>
+                <a href="#applications" class="hover:underline">Applications</a>
+                <a href="#contact" class="hover:underline">Contact</a>
+                <a href="login.html" class="bg-white text-blue-600 px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">Login</a>
+            </nav>
+            <button class="md:hidden" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+        <div id="mobileMenu" class="md:hidden hidden bg-blue-700 text-white px-4 py-2 space-y-2">
+            <a href="#about" class="block">About</a>
+            <a href="#applications" class="block">Applications</a>
+            <a href="#contact" class="block">Contact</a>
+            <a href="login.html" class="block bg-white text-blue-600 px-3 py-1 rounded-md shadow">Login</a>
+        </div>
     </header>
 
-    <!-- Logo Section (under header, no border or shadow) -->
+    <!-- Logo Section -->
     <section class="flex justify-center mt-6">
-        <img src="images/digital_twin_logo.png" alt="Digital Twin Logo" class="w-40 sm:w-52 md:w-60">
+        <img src="images/digital_twin_logo.png" alt="Digital Twin Logo" class="w-32 sm:w-48 md:w-56">
     </section>
 
     <!-- Main Content -->
@@ -82,7 +88,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="text-center p-4 text-white bg-blue-800 text-sm sm:text-base">
+    <footer class="text-center p-4 text-white bg-gradient-to-r from-blue-800 to-cyan-500 text-sm sm:text-base">
         © 2025 Digital Twin | All rights reserved.
     </footer>
 </body>
