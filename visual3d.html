@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>King Abdullah Bridge 3D Visualization</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script type="importmap">
     {
         "imports": {
@@ -12,29 +13,29 @@
         }
     }
     </script>
-  <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to bottom, #f0f7f7, #dfe9ec);
-      margin: 0;
-      padding: 0;
-    }
-    .logo {
-      width: 96px;
-      height: 96px;
-      filter: drop-shadow(0 0 8px #9e9e9e);
-    }
-    .header-gradient {
-      background: linear-gradient(135deg, #b0bec5, #eceff1, #ffffff);
-    }
-    .footer-gradient {
-      background: linear-gradient(135deg, #9e9e9e, #757575);
-    }
-  </style>
+    <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(to bottom, #f0f7f7, #dfe9ec);
+        margin: 0;
+        padding: 0;
+      }
+      .logo {
+        width: 96px;
+        height: 96px;
+        filter: drop-shadow(0 0 8px #9e9e9e);
+      }
+      .header-gradient {
+        background: linear-gradient(135deg, #b0bec5, #eceff1, #ffffff);
+      }
+      .footer-gradient {
+        background: linear-gradient(135deg, #9e9e9e, #757575);
+      }
+    </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- Header -->
+  <!-- Header -->
   <header class="header-gradient shadow-lg">
     <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
       <div class="flex items-center space-x-4">
@@ -50,25 +51,25 @@
       </div>
     </div>
     <div id="mobileMenu" class="md:hidden hidden bg-white px-4 py-3">
-        <a href="admin.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Admin</a>
+      <a href="admin.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Admin</a>
     </div>
   </header>
 
-    <!-- Three.js Canvas -->
-    <div id="threeCanvas" class="flex-grow" style="width: 100%; height: 70vh;"></div>
+  <!-- Three.js Canvas -->
+  <div id="threeCanvas" class="flex-grow" style="width: 100%; height: 70vh;"></div>
 
-    <!-- Project Details -->
-    <section id="projectDetails" class="p-4 text-center bg-white rounded-lg shadow max-w-xl mx-auto -mt-10 relative z-10">
-        <!-- Project data will be injected here -->
-    </section>
+  <!-- Project Details -->
+  <section id="projectDetails" class="p-6 bg-white rounded-xl shadow-lg max-w-2xl mx-auto -mt-10 relative z-10">
+      <p class="text-center text-gray-500">Loading project details...</p>
+  </section>
 
-    <!-- Footer -->
+  <!-- Footer -->
   <footer class="footer-gradient text-center p-4 text-white text-sm sm:text-base">
     © 2025 Digital Twin | All rights reserved.
   </footer>
 
-    <!-- Three.js Script -->
-    <script type="module">
+  <!-- Three.js Script -->
+  <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
     import { GLTFLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js';
@@ -107,14 +108,55 @@
     }
     animate();
 
+    // Load and display project details
+    const detailsSection = document.getElementById('projectDetails');
     const projectId = localStorage.getItem('selectedRequestId');
     const allRequests = JSON.parse(localStorage.getItem('requests')) || [];
-    const project = allRequests.find(r => r.id === projectId) || { title: 'King Abdullah Bridge 3D Visualization', description: 'Default description.', type: 'Infrastructure' };
-    document.getElementById('projectDetails').innerHTML = `
-        <h2 class="text-2xl font-bold text-blue-800">${project.title}</h2>
-        <p class="text-lg">${project.description}</p>
-        <p><strong>Type:</strong> ${project.type}</p>
-    `;
-    </script>
+
+    if (!projectId) {
+      detailsSection.innerHTML = `<p class="text-center text-red-600 font-bold">No project selected. Please return to the admin panel.</p>`;
+    } else {
+      const project = allRequests.find(r => r.id === projectId);
+      if (project) {
+        detailsSection.innerHTML = `
+          <h2 class="text-3xl font-bold text-blue-800 mb-4">${project.title}</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800">
+            <div class="bg-gradient-to-r from-cyan-100 to-blue-100 p-4 rounded-lg shadow flex items-center space-x-2">
+              <i class="fas fa-info-circle fa-lg text-blue-700"></i>
+              <div><p class="font-semibold">Description</p><p>${project.description}</p></div>
+            </div>
+            <div class="bg-gradient-to-r from-cyan-100 to-blue-100 p-4 rounded-lg shadow flex items-center space-x-2">
+              <i class="fas fa-layer-group fa-lg text-blue-700"></i>
+              <div><p class="font-semibold">Type</p><p>${project.type}</p></div>
+            </div>
+            <div class="bg-gradient-to-r from-cyan-100 to-blue-100 p-4 rounded-lg shadow flex items-center space-x-2">
+              <i class="fas fa-tasks fa-lg text-blue-700"></i>
+              <div><p class="font-semibold">Status</p><p>${project.status || 'Pending'}</p></div>
+            </div>
+            <div class="bg-gradient-to-r from-cyan-100 to-blue-100 p-4 rounded-lg shadow flex items-center space-x-2">
+              <i class="fas fa-calendar-alt fa-lg text-blue-700"></i>
+              <div><p class="font-semibold">Date</p><p>${project.submittedAt || project.date}</p></div>
+            </div>
+            <div class="bg-gradient-to-r from-cyan-100 to-blue-100 p-4 rounded-lg shadow flex items-center space-x-2">
+              <i class="fas fa-user fa-lg text-blue-700"></i>
+              <div><p class="font-semibold">Client</p><p>${project.name || project.client}</p></div>
+            </div>
+            <div class="bg-gradient-to-r from-cyan-100 to-blue-100 p-4 rounded-lg shadow flex items-center space-x-2">
+              <i class="fas fa-phone fa-lg text-blue-700"></i>
+              <div><p class="font-semibold">Contact</p><p>${project.phone || project.contact}</p></div>
+            </div>
+          </div>
+          <div class="mt-6 text-center">
+            <a href="admin.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all">
+              ⬅ Back to Admin
+            </a>
+          </div>
+        `;
+      } else {
+        detailsSection.innerHTML = `<p class="text-center text-red-600 font-bold">Project not found. Please return to the admin panel.</p>`;
+      }
+    }
+  </script>
+
 </body>
 </html>
