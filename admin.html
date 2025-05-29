@@ -61,33 +61,38 @@
   </footer>
 
   <script>
-    const staticRequests = [
-        {
-            id: 'REQ-000',
-            name: 'Ahmed Al Omari',
-            email: 'Ahmad@gmail.com',
-            phone: '0551234567',
-            title: 'Digital Twin for Abdullah Bridge',
-            description: 'Creating a digital twin for King Abdullah Bridge for smart traffic management and structural monitoring.',
-            type: 'Infrastructure Management',
-            submittedAt: '28 May 2025, 04:38',
-            status: 'Pending'
-        }
-    ];
+    const staticRequest = {
+        id: 'REQ-000',
+        name: 'Ahmed Al Omari',
+        email: 'Ahmad@gmail.com',
+        phone: '0551234567',
+        title: 'Digital Twin for Abdullah Bridge',
+        description: 'Creating a digital twin for King Abdullah Bridge for smart traffic management and structural monitoring.',
+        type: 'Infrastructure Management',
+        submittedAt: '28 May 2025, 04:38',
+        status: 'Pending'
+    };
 
-    // Merge with dynamic requests from LocalStorage
-    const dynamicRequests = JSON.parse(localStorage.getItem('requests')) || [];
-    const allRequests = staticRequests.concat(dynamicRequests);
+    // Load requests from localStorage or initialize with []
+    let requests = JSON.parse(localStorage.getItem('requests')) || [];
 
-    // Save combined requests to LocalStorage
-    localStorage.setItem('requests', JSON.stringify(allRequests));
+    // Add staticRequest only if it doesn't exist already
+    const isStaticExists = requests.some(r => r.id === staticRequest.id);
+    if (!isStaticExists) {
+        requests.unshift(staticRequest);  // Add to the beginning
+        localStorage.setItem('requests', JSON.stringify(requests));
+    }
 
     const requestsList = document.getElementById('requestsList');
 
-    if (allRequests.length === 0) {
-        requestsList.innerHTML = "<p class='text-center text-gray-600'>No requests found.</p>";
-    } else {
-        allRequests.forEach(req => {
+    function renderRequests() {
+        requestsList.innerHTML = "";
+        if (requests.length === 0) {
+            requestsList.innerHTML = "<p class='text-center text-gray-600'>No requests found.</p>";
+            return;
+        }
+
+        requests.forEach(req => {
             const card = document.createElement('div');
             card.className = 'bg-white shadow-md rounded-lg p-4';
             card.innerHTML = `
@@ -101,8 +106,9 @@
                 <p><strong>Submitted At:</strong> ${req.submittedAt}</p>
                 <div class="mt-2 space-x-2">
                     <button onclick="viewDetails('${req.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">View Details</button>
-                    <button id="accept-${req.id}" onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Accept</button>
-                    <button id="reject-${req.id}" onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Reject</button>
+                    <button onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Accept</button>
+                    <button onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Reject</button>
+                    <button onclick="deleteRequest('${req.id}')" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded">Delete</button>
                 </div>
                 <div id="note-${req.id}" class="mt-2 p-2 rounded-lg hidden"></div>
             `;
@@ -125,8 +131,6 @@
                     noteDiv.textContent = `✔️ Approved: ${note}`;
                     noteDiv.classList.remove('hidden');
                     noteDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-400');
-                    document.getElementById(`reject-${id}`).disabled = true;
-                    document.getElementById(`reject-${id}`).classList.add('opacity-50', 'cursor-not-allowed');
                 }
             });
     }
@@ -141,11 +145,32 @@
                     noteDiv.textContent = `❌ Rejected: ${note}`;
                     noteDiv.classList.remove('hidden');
                     noteDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-400');
-                    document.getElementById(`accept-${id}`).disabled = true;
-                    document.getElementById(`accept-${id}`).classList.add('opacity-50', 'cursor-not-allowed');
                 }
             });
     }
+
+    function deleteRequest(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will delete the request permanently!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                requests = requests.filter(r => r.id !== id);
+                localStorage.setItem('requests', JSON.stringify(requests));
+                renderRequests();
+                Swal.fire('Deleted!', 'The request has been deleted.', 'success');
+            }
+        });
+    }
+
+    // Initial render
+    renderRequests();
   </script>
+
 </body>
 </html>
