@@ -6,171 +6,222 @@
     <title>Admin - Manage Requests</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-      body {
-        font-family: 'Roboto', sans-serif;
-        background: linear-gradient(to bottom, #f0f7f7, #dfe9ec);
-        margin: 0;
-        padding: 0;
-      }
-      .logo {
-        width: 96px;
-        height: 96px;
-        filter: drop-shadow(0 0 8px #9e9e9e);
-      }
-      .header-gradient {
-        background: linear-gradient(135deg, #b0bec5, #eceff1, #ffffff);
-      }
-      .footer-gradient {
-        background: linear-gradient(135deg, #9e9e9e, #757575);
-      }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f1f5f9; /* Slate gray background */
+            color: #1f2937;
+        }
+        .logo {
+            width: 80px;
+            height: auto;
+        }
+        .header-shadow {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+        /* Custom styles for SweetAlert2 */
+        .swal2-popup {
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <!-- Header -->
-  <header class="header-gradient shadow-lg">
-    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-      <div class="flex items-center space-x-4">
-        <img src="images/digital_twin_logo_highres.png" alt="Digital Twin Logo" class="logo" />
-      </div>
-      <button class="md:hidden" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
-        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-      <div class="hidden md:flex">
-        <a href="index.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Home</a>
-      </div>
-    </div>
-    <div id="mobileMenu" class="md:hidden hidden bg-white px-4 py-3">
-      <a href="index.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Home</a>
-    </div>
-  </header>
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 header-shadow">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-3">
+            <div class="flex items-center space-x-4">
+                <img src="images/digital_twin_logo_highres.png" alt="Digital Twin Logo" class="logo" />
+                <span class="text-2xl font-bold text-gray-800 hidden sm:block">Admin Panel</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-full shadow-lg transition-all flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </header>
 
-  <!-- Main Content -->
-  <main class="p-8 max-w-7xl mx-auto flex-grow">
-      <h2 class="text-2xl font-semibold text-center mb-8 text-blue-800">Received Project Requests</h2>
-      <div id="requestsList" class="space-y-4"></div>
-  </main>
+    <main class="w-full max-w-7xl mx-auto py-12 px-6 flex-grow">
+        <div class="text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Received Project Requests</h2>
+            <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 mb-6"></div>
+        </div>
+        <div id="requestsList" class="space-y-6 mt-12">
+            </div>
+    </main>
 
-  <!-- Footer -->
-  <footer class="footer-gradient text-center p-4 text-white text-sm sm:text-base">
-    © 2025 Digital Twin | All rights reserved.
-  </footer>
+    <footer class="bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto py-8 px-6 text-center">
+            <p>&copy; 2025 Digital Twin | All Rights Reserved.</p>
+        </div>
+    </footer>
 
-  <script>
-    const staticRequest = {
-        id: 'REQ-000',
-        name: 'Ahmed Al Omari',
-        email: 'Ahmad@gmail.com',
-        phone: '0551234567',
-        title: 'Digital Twin for Abdullah Bridge',
-        description: 'Creating a digital twin for King Abdullah Bridge for smart traffic management and structural monitoring.',
-        type: 'Infrastructure Management',
-        submittedAt: '28 May 2025, 04:38',
-        status: 'Pending'
-    };
+    <script>
+        // --- DATA INITIALIZATION ---
+        const staticRequest = {
+            id: 'REQ-000',
+            name: 'Ahmed Al Omari',
+            email: 'Ahmad@gmail.com',
+            phone: '0551234567',
+            title: 'Digital Twin for Abdullah Bridge',
+            description: 'Creating a digital twin for King Abdullah Bridge for smart traffic management and structural monitoring.',
+            type: 'Infrastructure Management',
+            submittedAt: '28 May 2025, 04:38',
+            status: 'Pending' // Initial status
+        };
 
-    // Load requests from localStorage or initialize with []
-    let requests = JSON.parse(localStorage.getItem('requests')) || [];
+        let requests = JSON.parse(localStorage.getItem('requests')) || [];
 
-    // Add staticRequest only if it doesn't exist already
-    const isStaticExists = requests.some(r => r.id === staticRequest.id);
-    if (!isStaticExists) {
-        requests.unshift(staticRequest);  // Add to the beginning
-        localStorage.setItem('requests', JSON.stringify(requests));
-    }
-
-    const requestsList = document.getElementById('requestsList');
-
-    function renderRequests() {
-        requestsList.innerHTML = "";
-        if (requests.length === 0) {
-            requestsList.innerHTML = "<p class='text-center text-gray-600'>No requests found.</p>";
-            return;
+        const isStaticExists = requests.some(r => r.id === staticRequest.id);
+        if (!isStaticExists) {
+            requests.unshift(staticRequest);
+            localStorage.setItem('requests', JSON.stringify(requests));
         }
 
-        requests.forEach(req => {
-            const card = document.createElement('div');
-            card.className = 'bg-white shadow-md rounded-lg p-4';
-            card.innerHTML = `
-                <h3 class="text-lg font-bold mb-2">${req.title}</h3>
-                <p><strong>Ticket:</strong> ${req.id}</p>
-                <p><strong>Name:</strong> ${req.name}</p>
-                <p><strong>Email:</strong> ${req.email}</p>
-                <p><strong>Phone:</strong> ${req.phone}</p>
-                <p><strong>Description:</strong> ${req.description}</p>
-                <p><strong>Type:</strong> ${req.type}</p>
-                <p><strong>Submitted At:</strong> ${req.submittedAt}</p>
-                <div class="mt-2 space-x-2">
-                    <button onclick="viewDetails('${req.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">View Details</button>
-                    <button onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Accept</button>
-                    <button onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Reject</button>
-                    <button onclick="deleteRequest('${req.id}')" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded">Delete</button>
-                </div>
-                <div id="note-${req.id}" class="mt-2 p-2 rounded-lg hidden"></div>
-            `;
-            requestsList.appendChild(card);
-        });
-    }
+        const requestsList = document.getElementById('requestsList');
 
-    function viewDetails(id) {
-        localStorage.setItem('selectedRequestId', id);
-        window.location.href = 'visual3d.html';
-    }
+        // --- STATUS STYLES ---
+        const statusStyles = {
+            Pending: 'bg-yellow-100 text-yellow-800',
+            Approved: 'bg-green-100 text-green-800',
+            Rejected: 'bg-red-100 text-red-800'
+        };
 
-    function acceptRequest(id) {
-        Swal.fire({ title: 'Accept Request', input: 'text', inputLabel: 'Approval Note (optional):', showCancelButton: true })
-            .then(result => {
+        // --- RENDER FUNCTION ---
+        function renderRequests() {
+            requestsList.innerHTML = "";
+            if (requests.length === 0) {
+                requestsList.innerHTML = `
+                    <div class="text-center py-16 px-6 bg-white rounded-lg shadow-md">
+                        <i class="fas fa-inbox text-6xl text-gray-300"></i>
+                        <p class="mt-4 text-xl text-gray-500">No requests found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            requests.forEach(req => {
+                const card = document.createElement('div');
+                card.className = 'bg-white shadow-lg rounded-xl overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
+                card.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">${req.title}</h3>
+                            <span class="text-sm font-semibold px-3 py-1 rounded-full ${statusStyles[req.status] || 'bg-gray-100 text-gray-800'}">
+                                ${req.status}
+                            </span>
+                        </div>
+                        <p class="text-blue-600 font-semibold mb-4">${req.type}</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="md:col-span-1 border-r border-gray-200 pr-6">
+                                <h4 class="font-bold text-gray-600 mb-2">Submitted By</h4>
+                                <p><i class="fas fa-user w-5 text-gray-400 mr-2"></i>${req.name}</p>
+                                <p><i class="fas fa-envelope w-5 text-gray-400 mr-2"></i>${req.email}</p>
+                                <p><i class="fas fa-phone-alt w-5 text-gray-400 mr-2"></i>${req.phone}</p>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <p class="text-gray-600 mb-4">${req.description}</p>
+                                <div class="flex justify-between items-center text-sm text-gray-500">
+                                    <span><strong>Ticket:</strong> ${req.id}</span>
+                                    <span><strong>Submitted:</strong> ${req.submittedAt}</span>
+                                </div>
+                                <div class="mt-6 border-t pt-4 flex flex-wrap gap-3">
+                                    <button onclick="viewDetails('${req.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all"><i class="fas fa-eye mr-2"></i>View Details</button>
+                                    <button onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all"><i class="fas fa-check-circle mr-2"></i>Accept</button>
+                                    <button onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all"><i class="fas fa-times-circle mr-2"></i>Reject</button>
+                                    <button onclick="deleteRequest('${req.id}')" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all ml-auto"><i class="fas fa-trash-alt mr-2"></i>Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                requestsList.appendChild(card);
+            });
+        }
+
+        // --- ACTION FUNCTIONS ---
+        function updateRequestStatus(id, newStatus, note) {
+            const requestIndex = requests.findIndex(r => r.id === id);
+            if (requestIndex > -1) {
+                requests[requestIndex].status = newStatus;
+                // You can also add the note to the request object if needed
+                // requests[requestIndex].note = note; 
+                localStorage.setItem('requests', JSON.stringify(requests));
+                renderRequests(); // Re-render to show the new status badge
+            }
+        }
+        
+        function viewDetails(id) {
+            localStorage.setItem('selectedRequestId', id);
+            window.location.href = 'visual3d.html';
+        }
+
+        function acceptRequest(id) {
+            Swal.fire({ 
+                title: 'Accept Request', 
+                input: 'text', 
+                inputLabel: 'Approval Note (optional):',
+                confirmButtonText: 'Accept',
+                confirmButtonColor: '#16a34a', // green-600
+                showCancelButton: true 
+            }).then(result => {
                 if (result.isConfirmed) {
                     const note = result.value || 'Approved';
-                    Swal.fire('✅ Approved', note, 'success');
-                    const noteDiv = document.getElementById(`note-${id}`);
-                    noteDiv.textContent = `✔️ Approved: ${note}`;
-                    noteDiv.classList.remove('hidden');
-                    noteDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-400');
+                    updateRequestStatus(id, 'Approved', note);
+                    Swal.fire('Approved!', `The request has been marked as approved. Note: ${note}`, 'success');
                 }
             });
-    }
+        }
 
-    function rejectRequest(id) {
-        Swal.fire({ title: 'Reject Request', input: 'text', inputLabel: 'Reason for rejection:', showCancelButton: true })
-            .then(result => {
+        function rejectRequest(id) {
+            Swal.fire({ 
+                title: 'Reject Request', 
+                input: 'text', 
+                inputLabel: 'Reason for rejection (required):', 
+                confirmButtonText: 'Reject',
+                confirmButtonColor: '#dc2626', // red-600
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value) { return 'You need to provide a reason for rejection!' }
+                }
+            }).then(result => {
                 if (result.isConfirmed) {
-                    const note = result.value || 'Rejected';
-                    Swal.fire('❌ Rejected', note, 'error');
-                    const noteDiv = document.getElementById(`note-${id}`);
-                    noteDiv.textContent = `❌ Rejected: ${note}`;
-                    noteDiv.classList.remove('hidden');
-                    noteDiv.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-400');
+                    const reason = result.value;
+                    updateRequestStatus(id, 'Rejected', reason);
+                    Swal.fire('Rejected!', `The request has been rejected. Reason: ${reason}`, 'error');
                 }
             });
-    }
+        }
 
-    function deleteRequest(id) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "This will delete the request permanently!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                requests = requests.filter(r => r.id !== id);
-                localStorage.setItem('requests', JSON.stringify(requests));
-                renderRequests();
-                Swal.fire('Deleted!', 'The request has been deleted.', 'success');
-            }
-        });
-    }
+        function deleteRequest(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This will delete the request permanently!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#3b82f6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    requests = requests.filter(r => r.id !== id);
+                    localStorage.setItem('requests', JSON.stringify(requests));
 
-    // Initial render
-    renderRequests();
-  </script>
+                    const cardElement = document.querySelector(`[data-id="${id}"]`);
+                    if (cardElement) cardElement.remove();
+                    
+                    renderRequests(); // Re-render the list
+                    Swal.fire('Deleted!', 'The request has been deleted.', 'success');
+                }
+            });
+        }
 
+        // Initial render
+        renderRequests();
+    </script>
 </body>
 </html>

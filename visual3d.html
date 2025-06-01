@@ -32,19 +32,15 @@
     <header class="w-full max-w-7xl bg-white shadow-md rounded-lg mb-6">
         <div class="mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-3">
-                
                 <a href="#" class="flex justify-start items-center space-x-3">
                     <svg class="h-8 w-auto text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
                     </svg>
                     <span class="font-bold text-xl text-gray-800">Bridge Simulation</span>
                 </a>
-
                 <nav class="hidden md:flex">
                      <a href="admin.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Admin </a>
-
                 </nav>
-
                 <div class="md:hidden">
                     <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none">
                         <span class="sr-only">Open main menu</span>
@@ -58,15 +54,14 @@
                 </div>
             </div>
         </div>
-
         <div id="mobile-menu" class="md:hidden hidden">
              <div class="hidden md:flex">
-                 <a href="index.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Home</a>
+                   <a href="index.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">⬅ Back to Home</a>
              </div>
         </div>
     </header>
 
-    <main class="w-full max-w-5xl">
+    <main class="w-full max-w-7xl">
         <h1 class="text-3xl font-bold text-center mb-6 text-gray-700">Bridge Stress & Vibration Simulation</h1>
         <div id="container3D"></div>
         <div class="control-panel mt-6">
@@ -104,21 +99,19 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'OrbitControls';
 
-        // --- ✅ JAVASCRIPT: Fully translated ---
-        
-        // Core Three.js variables
+        // --- Core Three.js variables ---
         let scene, camera, renderer, controls, clock;
         let bridgeRoad, bridgeStructureGroup;
         let carsOnBridge = [];
-        let originalRoadColor = 0x555555;
+        let originalRoadColor = 0x444444;
         let stressColor = 0xff0000;
-        let carColors = [0x007bff, 0xffc107, 0x28a745, 0xdc3545, 0x6c757d];
+        let carColors = [0x007bff, 0xffc107, 0x28a745, 0xdc3545, 0x6c757d, 0x343a40, 0xf8f9fa];
         let isShaking = false;
         let shakeStartTime = 0;
         const SHAKE_DURATION = 1;
-        const SHAKE_INTENSITY = 0.1;
+        const SHAKE_INTENSITY = 0.2;
 
-        // HTML control elements
+        // --- HTML control elements ---
         const carCountInput = document.getElementById('carCountInput');
         const increaseCarsButton = document.getElementById('increaseCars');
         const decreaseCarsButton = document.getElementById('decreaseCars');
@@ -127,20 +120,23 @@
         const currentCarCountDisplay = document.getElementById('currentCarCount');
         const container3D = document.getElementById('container3D');
 
-        // Constants
+        // ✅ --- UPDATED Constants ---
         const MAX_CARS_STRESS = 300;
-        const BRIDGE_ROAD_LENGTH = 40;
-        const BRIDGE_ROAD_WIDTH = 8;
-        const BRIDGE_PILLAR_HEIGHT = 10;
+        const BRIDGE_ROAD_LENGTH = 160; // Increased length
+        const BRIDGE_ROAD_WIDTH = 9;
+        const BRIDGE_ROAD_HEIGHT = 10; // Height of the road deck from the ground
+        const BRIDGE_TOWER_HEIGHT = 40; // Height of the suspension towers
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xabcdef);
+            scene.background = new THREE.Color(0xaaccff); // Lighter blue sky
+            scene.fog = new THREE.Fog(0xaaccff, 100, 600); // Add fog for distance effect
             clock = new THREE.Clock();
 
             camera = new THREE.PerspectiveCamera(60, container3D.clientWidth / container3D.clientHeight, 0.1, 2000);
-            camera.position.set(25, 15, 35);
-            camera.lookAt(0, 5, 0);
+            // ✅ Adjusted camera position for a wider view
+            camera.position.set(BRIDGE_ROAD_LENGTH * 0.7, 40, 60);
+            camera.lookAt(0, 0, 0);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container3D.clientWidth, container3D.clientHeight);
@@ -151,51 +147,211 @@
 
             controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
+            controls.target.set(0, 10, 0); // Target the center of the bridge
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(-40, 50, 40);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            directionalLight.position.set(-100, 120, 80);
             directionalLight.castShadow = true;
+            // ✅ Adjust shadow camera for the larger scene
+            directionalLight.shadow.camera.left = -200;
+            directionalLight.shadow.camera.right = 200;
+            directionalLight.shadow.camera.top = 200;
+            directionalLight.shadow.camera.bottom = -200;
+            directionalLight.shadow.camera.far = 500;
             scene.add(directionalLight);
 
-            createBridge();
-            createGround();
+            // ✅ Call new functions to create the environment
+            createGroundAndWater();
+            createCityscape();
+            createBridge(); // Create the new bridge
 
             window.addEventListener('resize', onWindowResize, false);
             animate();
         }
+        
+        // ✅ --- NEW REALISTIC SUSPENSION BRIDGE ---
+        function createBridge() {
+            bridgeStructureGroup = new THREE.Group();
+            
+            // Materials
+            const roadMaterial = new THREE.MeshStandardMaterial({ color: originalRoadColor, roughness: 0.8 });
+            const towerMaterial = new THREE.MeshStandardMaterial({ color: 0x992222, roughness: 0.7 });
+            const cableMaterial = new THREE.MeshStandardMaterial({ color: 0xbbbbbb, metalness: 0.8, roughness: 0.4 });
+            
+            // 1. Road Deck
+            const roadGeometry = new THREE.BoxGeometry(BRIDGE_ROAD_LENGTH, 1, BRIDGE_ROAD_WIDTH);
+            bridgeRoad = new THREE.Mesh(roadGeometry, roadMaterial);
+            bridgeRoad.position.y = BRIDGE_ROAD_HEIGHT;
+            bridgeRoad.receiveShadow = true;
+            bridgeStructureGroup.add(bridgeRoad);
+
+            // Guardrails
+            const guardrailGeom = new THREE.BoxGeometry(BRIDGE_ROAD_LENGTH, 0.5, 0.1);
+            const guardrailMaterial = new THREE.MeshStandardMaterial({color: 0xaaaaaa});
+            const guardrail1 = new THREE.Mesh(guardrailGeom, guardrailMaterial);
+            guardrail1.position.set(0, BRIDGE_ROAD_HEIGHT + 0.75, BRIDGE_ROAD_WIDTH / 2 - 0.1);
+            bridgeStructureGroup.add(guardrail1);
+            const guardrail2 = guardrail1.clone();
+            guardrail2.position.z = - (BRIDGE_ROAD_WIDTH / 2 - 0.1);
+            bridgeStructureGroup.add(guardrail2);
+
+            // 2. Towers
+            const towerWidth = 4;
+            const towerDepth = 6;
+            const towerGeom = new THREE.BoxGeometry(towerWidth, BRIDGE_TOWER_HEIGHT, towerDepth);
+            const towerPositionsX = [-BRIDGE_ROAD_LENGTH / 3, BRIDGE_ROAD_LENGTH / 3];
+
+            towerPositionsX.forEach(xPos => {
+                const tower = new THREE.Mesh(towerGeom, towerMaterial);
+                tower.position.set(xPos, BRIDGE_TOWER_HEIGHT / 2, 0);
+                tower.castShadow = true;
+                bridgeStructureGroup.add(tower);
+            });
+
+            // 3. Main Suspension Cables
+            const cableRadius = 0.2;
+            const anchorPointY = BRIDGE_ROAD_HEIGHT + 2;
+            const cableSag = BRIDGE_TOWER_HEIGHT - 5;
+            
+            for(let side of [-1, 1]) {
+                const mainCableCurve = new THREE.CatmullRomCurve3([
+                    new THREE.Vector3(-BRIDGE_ROAD_LENGTH / 2, anchorPointY, (BRIDGE_ROAD_WIDTH / 2 - 1) * side),
+                    new THREE.Vector3(towerPositionsX[0], BRIDGE_TOWER_HEIGHT, (BRIDGE_ROAD_WIDTH / 2 - 1) * side),
+                    new THREE.Vector3(0, cableSag, (BRIDGE_ROAD_WIDTH / 2 - 1) * side),
+                    new THREE.Vector3(towerPositionsX[1], BRIDGE_TOWER_HEIGHT, (BRIDGE_ROAD_WIDTH / 2 - 1) * side),
+                    new THREE.Vector3(BRIDGE_ROAD_LENGTH / 2, anchorPointY, (BRIDGE_ROAD_WIDTH / 2 - 1) * side),
+                ]);
+                const mainCableGeom = new THREE.TubeGeometry(mainCableCurve, 128, cableRadius, 8, false);
+                const mainCable = new THREE.Mesh(mainCableGeom, cableMaterial);
+                bridgeStructureGroup.add(mainCable);
+
+                // 4. Vertical Suspender Cables
+                const verticalCableGeom = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+                const cablePoints = mainCableCurve.getPoints(BRIDGE_ROAD_LENGTH / 8); // Get points along the curve
+                cablePoints.forEach(p => {
+                    if (Math.abs(p.x) < BRIDGE_ROAD_LENGTH / 2) {
+                        const cableHeight = p.y - (BRIDGE_ROAD_HEIGHT + 0.5);
+                        if (cableHeight > 0.1) {
+                            const verticalCable = new THREE.Mesh(verticalCableGeom, cableMaterial);
+                            verticalCable.scale.y = cableHeight;
+                            verticalCable.position.set(p.x, p.y - cableHeight/2, p.z);
+                            bridgeStructureGroup.add(verticalCable);
+                        }
+                    }
+                });
+            }
+            scene.add(bridgeStructureGroup);
+        }
+
+        // ✅ --- NEW FUNCTION TO CREATE CITYSCAPE ---
+        function createCityscape() {
+            const numBuildings = 200;
+            const cityArea = 800;
+            const buildingMaterials = [
+                new THREE.MeshStandardMaterial({ color: 0x666666 }),
+                new THREE.MeshStandardMaterial({ color: 0x888888 }),
+                new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.2, metalness: 0.5 }),
+            ];
+            
+            for (let i = 0; i < numBuildings; i++) {
+                const height = Math.random() * 100 + 20;
+                const width = Math.random() * 15 + 8;
+                const depth = Math.random() * 15 + 8;
+                const buildingGeom = new THREE.BoxGeometry(width, height, depth);
+                const buildingMaterial = buildingMaterials[Math.floor(Math.random() * buildingMaterials.length)];
+                const building = new THREE.Mesh(buildingGeom, buildingMaterial);
+
+                // Position buildings randomly, avoiding the bridge and water
+                let xPos, zPos;
+                do {
+                    xPos = (Math.random() - 0.5) * cityArea;
+                    zPos = (Math.random() - 0.5) * cityArea;
+                } while (Math.abs(zPos) < BRIDGE_ROAD_WIDTH + 30); // Keep them away from the bridge Z-axis
+
+                building.position.set(xPos, height / 2, zPos);
+                building.castShadow = true;
+                building.receiveShadow = true;
+                scene.add(building);
+            }
+        }
+
+        // ✅ --- NEW FUNCTION FOR GROUND AND WATER ---
+        function createGroundAndWater() {
+            // Ground
+            const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x77aa77, roughness: 1 });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Water
+            const waterGeometry = new THREE.PlaneGeometry(1000, 120);
+            const waterMaterial = new THREE.MeshStandardMaterial({ color: 0x336699, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.8 });
+            const water = new THREE.Mesh(waterGeometry, waterMaterial);
+            water.rotation.x = -Math.PI / 2;
+            water.position.y = 0.1; // Slightly above ground to prevent z-fighting
+            scene.add(water);
+        }
 
         function createCar(color) {
             const carGroup = new THREE.Group();
-            const bodyMaterial = new THREE.MeshStandardMaterial({ color: color || 0xff0000, roughness: 0.3, metalness: 0.5 });
-            const bodyGeometry = new THREE.BoxGeometry(4, 1.5, 2);
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: color || 0xff0000, roughness: 0.3, metalness: 0.7 });
+            const windowMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.8 });
+            const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+            const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffbb });
+            const taillightMaterial = new THREE.MeshBasicMaterial({ color: 0xdd2222 });
+            const bodyGeometry = new THREE.BoxGeometry(4, 1, 2); 
             const carBody = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            carBody.position.y = 0.5;
             carBody.castShadow = true;
             carGroup.add(carBody);
-
-            const cabinGeometry = new THREE.BoxGeometry(2.5, 1, 1.8);
-            const carCabin = new THREE.Mesh(cabinGeometry, bodyMaterial);
-            carCabin.position.set(-0.25, 1.25, 0);
+            const cabinGeometry = new THREE.BoxGeometry(2.5, 0.8, 1.8);
+            const carCabin = new THREE.Mesh(cabinGeometry, windowMaterial);
+            carCabin.position.set(-0.25, 1.4, 0);
             carCabin.castShadow = true;
             carGroup.add(carCabin);
-
+            const wheelRadius = 0.4;
+            const wheelWidth = 0.2;
+            const wheelGeometry = new THREE.CylinderGeometry(wheelRadius, wheelRadius, wheelWidth, 24);
+            wheelGeometry.rotateX(Math.PI / 2);
+            const wheelPositions = [
+                new THREE.Vector3(1.5, 0, 1), new THREE.Vector3(1.5, 0, -1),
+                new THREE.Vector3(-1.5, 0, 1), new THREE.Vector3(-1.5, 0, -1)
+            ];
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.position.copy(pos);
+                wheel.castShadow = true;
+                carGroup.add(wheel);
+            });
+            const lightGeom = new THREE.BoxGeometry(0.2, 0.2, 0.1);
+            const headLight1 = new THREE.Mesh(lightGeom, headlightMaterial);
+            headLight1.position.set(2.01, 0.5, 0.6);
+            carGroup.add(headLight1);
+            const headLight2 = headLight1.clone();
+            headLight2.position.set(2.01, 0.5, -0.6);
+            carGroup.add(headLight2);
+            const tailLight1 = new THREE.Mesh(lightGeom, taillightMaterial);
+            tailLight1.position.set(-2.01, 0.5, 0.6);
+            carGroup.add(tailLight1);
+            const tailLight2 = tailLight1.clone();
+            tailLight2.position.set(-2.01, 0.5, -0.6);
+            carGroup.add(tailLight2);
             return carGroup;
         }
         
         function addACar() {
-            const carHeightOffset = 0.5 / 2 + 1.5 / 2;
+            const carHeightOffset = 0.5 + 0.4; // road half-height + wheel radius
             const randomColor = carColors[Math.floor(Math.random() * carColors.length)];
             const car = createCar(randomColor);
-
-            const xPos = (Math.random() - 0.5) * (BRIDGE_ROAD_LENGTH - 4);
-            const zPos = (Math.random() - 0.5) * (BRIDGE_ROAD_WIDTH - 2.5);
+            const xPos = (Math.random() - 0.5) * (BRIDGE_ROAD_LENGTH - 10);
+            const zPos = (Math.random() - 0.5) * (BRIDGE_ROAD_WIDTH - 3);
             car.position.set(xPos, bridgeRoad.position.y + carHeightOffset, zPos);
-            if (Math.random() > 0.5) {
-                car.rotation.y = Math.PI;
-            }
-
+            if (Math.random() > 0.5) { car.rotation.y = Math.PI; }
             bridgeStructureGroup.add(car);
             carsOnBridge.push(car);
         }
@@ -207,51 +363,14 @@
             }
         }
 
-        function createBridge() {
-            bridgeStructureGroup = new THREE.Group();
-            
-            const roadMaterial = new THREE.MeshStandardMaterial({ color: originalRoadColor, roughness: 0.6, metalness: 0.3 });
-            const roadGeometry = new THREE.BoxGeometry(BRIDGE_ROAD_LENGTH, 0.5, BRIDGE_ROAD_WIDTH);
-            bridgeRoad = new THREE.Mesh(roadGeometry, roadMaterial);
-            bridgeRoad.position.y = BRIDGE_PILLAR_HEIGHT;
-            bridgeRoad.receiveShadow = true;
-            bridgeStructureGroup.add(bridgeRoad);
-
-            const pillarMaterial = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.8 });
-            const pillarSize = 2;
-            const pillarGeometry = new THREE.BoxGeometry(pillarSize, BRIDGE_PILLAR_HEIGHT, pillarSize);
-            const pillarPositionsX = [-BRIDGE_ROAD_LENGTH / 2 + 5, -BRIDGE_ROAD_LENGTH / 4, BRIDGE_ROAD_LENGTH / 4, BRIDGE_ROAD_LENGTH / 2 - 5];
-            pillarPositionsX.forEach(xPos => {
-                [- (BRIDGE_ROAD_WIDTH / 2 - pillarSize / 2), (BRIDGE_ROAD_WIDTH / 2 - pillarSize / 2)].forEach(zPos => {
-                    const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
-                    pillar.position.set(xPos, BRIDGE_PILLAR_HEIGHT / 2, zPos);
-                    pillar.castShadow = true;
-                    bridgeStructureGroup.add(pillar);
-                });
-            });
-            scene.add(bridgeStructureGroup);
-        }
-
-        function createGround() {
-            const groundGeometry = new THREE.PlaneGeometry(300, 300);
-            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x8BC34A, roughness: 1 });
-            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-            ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
-            scene.add(ground);
-        }
-
         function updateBridgeStressColor(carCount) {
             const isOverLimit = carCount > MAX_CARS_STRESS;
             const targetColor = isOverLimit ? stressColor : originalRoadColor;
             bridgeRoad.material.color.setHex(targetColor);
-
             if (isOverLimit) {
                 showMessage(`High stress! Count (${carCount}) exceeds the allowed limit.`, "error");
             } else {
-                if (messageBox.textContent.includes("High stress!")) {
-                    hideMessage();
-                }
+                if (messageBox.textContent.includes("High stress!")) { hideMessage(); }
             }
         }
 
@@ -275,53 +394,42 @@
         function animate() {
             requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
-            
             if (isShaking) {
                 const shakeTime = elapsedTime - shakeStartTime;
                 if (shakeTime < SHAKE_DURATION) {
                     bridgeStructureGroup.position.y = (Math.random() - 0.5) * SHAKE_INTENSITY;
+                    bridgeStructureGroup.position.x = (Math.random() - 0.5) * SHAKE_INTENSITY;
                 } else {
-                    bridgeStructureGroup.position.y = 0; // Reset position
+                    bridgeStructureGroup.position.set(0,0,0); // Reset position
                     isShaking = false;
                 }
             }
-
             controls.update();
             renderer.render(scene, camera);
         }
 
         function updateCarCount() {
             let count = parseInt(carCountInput.value);
-            if (isNaN(count) || count < 0) {
-                count = 0;
-                carCountInput.value = 0;
-            }
-            
+            if (isNaN(count) || count < 0) { count = 0; carCountInput.value = 0; }
             const carDifference = count - carsOnBridge.length;
-
             if (carDifference > 0) {
                 for(let i = 0; i < carDifference; i++) addACar();
             } else {
                 for(let i = 0; i < -carDifference; i++) removeACar();
             }
-            
             currentCarCountDisplay.textContent = count;
             updateBridgeStressColor(count);
         }
 
-        // --- Event Listeners ---
         increaseCarsButton.addEventListener('click', () => {
             carCountInput.value = parseInt(carCountInput.value) + parseInt(carCountInput.step);
             updateCarCount();
         });
-
         decreaseCarsButton.addEventListener('click', () => {
             carCountInput.value = Math.max(0, parseInt(carCountInput.value) - parseInt(carCountInput.step));
             updateCarCount();
         });
-
         carCountInput.addEventListener('change', updateCarCount);
-
         simulateVibrationButton.addEventListener('click', () => {
             if (!isShaking) {
                 showMessage("Vibration Simulation: A potential structural fault was detected!", "warning");
@@ -329,20 +437,16 @@
                 shakeStartTime = clock.getElapsedTime();
             }
         });
-        
-        // --- Mobile Menu Toggle ---
         const menuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const openIcon = document.getElementById('menu-open-icon');
         const closeIcon = document.getElementById('menu-close-icon');
-
         menuButton.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
             openIcon.classList.toggle('hidden');
             closeIcon.classList.toggle('hidden');
         });
 
-        // --- Initialisation ---
         init();
         updateCarCount();
     </script>

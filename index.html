@@ -5,111 +5,190 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Digital Twin</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to bottom, #f0f7f7, #dfe9ec);
-      margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif; /* Modern font for English */
+      background-color: #f1f5f9; /* Slate gray background */
+      color: #1f2937; /* Dark gray text color */
     }
     .logo {
-      width: 96px;
-      height: 96px;
-      filter: drop-shadow(0 0 8px #9e9e9e);
+      width: 80px;
+      height: auto;
     }
-    .header-gradient {
-      background: linear-gradient(135deg, #b0bec5, #eceff1, #ffffff);
+    .header-shadow {
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
     }
-    .footer-gradient {
-      background: linear-gradient(135deg, #9e9e9e, #757575);
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
     }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-  <!-- Header -->
-  <header class="header-gradient shadow-lg">
-    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+  <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 header-shadow">
+    <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-3">
       <div class="flex items-center space-x-4">
         <img src="images/digital_twin_logo_highres.png" alt="Digital Twin Logo" class="logo" />
+        <span class="text-2xl font-bold text-gray-800 hidden sm:block">Digital Twin</span>
       </div>
-      <button class="md:hidden" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
-        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-      <div class="hidden md:flex">
-        <a href="login.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">Employee Login</a>
+      <nav class="hidden md:flex items-center space-x-8 text-lg">
+        <a href="#about" class="text-gray-600 hover:text-blue-600 transition">About</a>
+        <a href="#applications" class="text-gray-600 hover:text-blue-600 transition">Applications</a>
+        <a href="#projects" class="text-gray-600 hover:text-blue-600 transition">Projects</a>
+        <a href="#contact" class="text-gray-600 hover:text-blue-600 transition">Contact</a>
+      </nav>
+      <div class="flex items-center space-x-4">
+         <a href="login.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-full shadow-lg transition-all hidden sm:block">Employee Login</a>
+         <button class="md:hidden" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">
+           <i class="fas fa-bars text-2xl text-gray-700"></i>
+         </button>
       </div>
     </div>
-    <div id="mobileMenu" class="md:hidden hidden bg-white px-4 py-3">
-        <a href="login.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-4 py-2 rounded-full shadow hover:shadow-lg transition-all">Employee Login</a>
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+      <a href="#about" class="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100">About</a>
+      <a href="#applications" class="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100">Applications</a>
+      <a href="#projects" class="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100">Projects</a>
+      <a href="#contact" class="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100">Contact</a>
+      <a href="login.html" class="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100">Employee Login</a>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="px-6 sm:px-12 md:px-24 lg:px-36 py-12 flex-grow space-y-16">
-    <section id="hero" class="text-center space-y-6">
-      <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-800 drop-shadow-md">Towards a Smarter Future</h1>
-      <p class="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto">
-        Empowering organizations with Digital Twin technology for real-time insights, efficiency, and innovation.
-      </p>
-      <a href="request.html" class="inline-block bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-bold px-6 py-3 rounded-full shadow-lg transition-all text-lg sm:text-xl">Request a Digital Project Now</a>
+  <main class="flex-grow">
+    <section id="hero" class="text-center py-20 md:py-32 px-6 bg-white">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 leading-tight">Towards a Smarter Future</h1>
+        <p class="mt-6 text-lg md:text-xl text-gray-600">
+          Empowering organizations with Digital Twin technology for real-time insights, efficiency, and innovation.
+        </p>
+        <a href="request.html" class="mt-10 inline-block bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-xl text-white font-bold px-8 py-4 rounded-full shadow-lg transition-all text-lg transform hover:scale-105">
+          <i class="fas fa-rocket mr-2"></i>
+          Request a Digital Project Now
+        </a>
+      </div>
     </section>
 
-    <section id="about" class="text-center space-y-4">
-      <h2 class="text-3xl sm:text-4xl font-bold text-blue-800 drop-shadow">About Digital Twin</h2>
-      <p class="text-lg sm:text-xl text-gray-700 max-w-4xl mx-auto">
-        Digital Twin technology bridges the physical and digital worlds, enabling smart management of assets and infrastructure. It integrates real-time data, 3D modeling, and analytics for proactive decision-making and performance optimization.
-      </p>
+    <section id="about" class="py-20 px-6">
+      <div class="text-center max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">About Digital Twin</h2>
+        <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 mb-6"></div>
+        <p class="text-lg text-gray-600">
+          Digital Twin technology bridges the physical and digital worlds, enabling smart management of assets and infrastructure. By integrating real-time data, 3D modeling, and advanced analytics, we help you make proactive decisions and optimize performance.
+        </p>
+      </div>
     </section>
 
-    <section id="applications" class="space-y-6">
-      <h2 class="text-3xl sm:text-4xl font-bold text-blue-800 text-center drop-shadow">Applications</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6">
-          <h3 class="font-bold text-lg sm:text-xl mb-2 text-blue-700">Infrastructure Management</h3>
-          <p>Monitor and manage bridges, roads, and utilities with real-time data and 3D visualization.</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6">
-          <h3 class="font-bold text-lg sm:text-xl mb-2 text-blue-700">Smart Manufacturing</h3>
-          <p>Optimize production lines with digital replicas of machinery and workflows.</p>
-        </div>
-        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all p-6">
-          <h3 class="font-bold text-lg sm:text-xl mb-2 text-blue-700">Urban Planning</h3>
-          <p>Create smarter cities with virtual models of buildings, transportation, and public services.</p>
+    <section id="applications" class="py-20 px-6 bg-white">
+      <div class="text-center max-w-5xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Our Applications & Solutions</h2>
+        <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 mb-6"></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+          <div class="bg-slate-50 rounded-xl shadow-md p-8 text-center card-hover">
+            <div class="text-blue-600 mb-4"><i class="fas fa-city text-5xl"></i></div>
+            <h3 class="font-bold text-2xl mb-2 text-gray-800">Infrastructure Management</h3>
+            <p class="text-gray-600">Monitor and manage bridges, roads, and utilities with real-time data and 3D visualization.</p>
+          </div>
+          <div class="bg-slate-50 rounded-xl shadow-md p-8 text-center card-hover">
+            <div class="text-blue-600 mb-4"><i class="fas fa-industry text-5xl"></i></div>
+            <h3 class="font-bold text-2xl mb-2 text-gray-800">Smart Manufacturing</h3>
+            <p class="text-gray-600">Optimize production lines with digital replicas of machinery and workflows.</p>
+          </div>
+          <div class="bg-slate-50 rounded-xl shadow-md p-8 text-center card-hover">
+            <div class="text-blue-600 mb-4"><i class="fas fa-map-marked-alt text-5xl"></i></div>
+            <h3 class="font-bold text-2xl mb-2 text-gray-800">Urban Planning</h3>
+            <p class="text-gray-600">Create smarter cities with virtual models of buildings, transportation, and public services.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- New Projects Gallery Section -->
-<section id="projects" class="mt-12">
-  <h2 class="text-3xl sm:text-4xl font-bold text-blue-800 text-center drop-shadow mb-6">Our Projects</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="images/project1.jpg" alt="Project 1" class="w-full h-60 object-cover">
-    </div>
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="images/project2.jpg" alt="Project 2" class="w-full h-60 object-cover">
-    </div>
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <img src="images/project3.jpg" alt="Project 3" class="w-full h-60 object-cover">
-    </div>
-  </div>
-</section>
+    <section id="projects" class="py-20 px-6">
+      <div class="text-center max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Our Featured Projects</h2>
+        <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 mb-6"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover group">
+            <img src="images/project1.jpg" alt="Project 1" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="p-6">
+              <h3 class="font-bold text-xl text-gray-800">Smart Bridge Project</h3>
+              <p class="text-gray-600 mt-2">Simulating and analyzing bridge stress to ensure safety.</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover group">
+            <img src="images/project2.jpg" alt="Project 2" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300">
+             <div class="p-6">
+              <h3 class="font-bold text-xl text-gray-800">Production Plant Modeling</h3>
+              <p class="text-gray-600 mt-2">Increasing operational efficiency via a factory digital twin.</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover group">
+            <img src="images/project3.jpg" alt="Project 3" class="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="p-6">
+              <h3 class="font-bold text-xl text-gray-800">Riyadh Urban Planning</h3>
+              <p class="text-gray-600 mt-2">Simulating traffic flows and public services.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-
-    <section id="contact" class="text-center space-y-4 mt-12">
-      <h2 class="text-3xl sm:text-4xl font-bold text-blue-800 drop-shadow">Contact Us</h2>
-      <p class="text-lg text-gray-700">Have questions or want to learn more? Reach out to us.</p>
-      <p class="text-lg text-gray-700">Email: contact@digitaltwin.com | Phone: +1234567890</p>
+    <section id="contact" class="py-20 px-6 bg-white">
+      <div class="text-center max-w-4xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Contact Us</h2>
+        <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 mb-6"></div>
+        <p class="text-lg text-gray-600">Have questions or want to learn more? Our team is ready to help you.</p>
+        <div class="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 text-lg">
+           <a href="mailto:contact@digitaltwin.com" class="text-gray-700 hover:text-blue-600 transition">
+             <i class="fas fa-envelope mr-2"></i> contact@digitaltwin.com
+           </a>
+           <a href="tel:+1234567890" class="text-gray-700 hover:text-blue-600 transition">
+             <i class="fas fa-phone-alt mr-2"></i> +1 (23) 456-7890
+           </a>
+        </div>
+      </div>
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer-gradient text-center p-4 text-white text-sm sm:text-base">
-    © 2025 Digital Twin | All rights reserved.
+  <footer class="bg-gray-800 text-white">
+    <div class="max-w-7xl mx-auto py-12 px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-xl font-bold mb-4">Digital Twin</h3>
+          <p class="text-gray-400">Building the digital future, today.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="#about" class="text-gray-400 hover:text-white">About Us</a></li>
+            <li><a href="#applications" class="text-gray-400 hover:text-white">Services</a></li>
+            <li><a href="#projects" class="text-gray-400 hover:text-white">Projects</a></li>
+          </ul>
+        </div>
+        <div>
+           <h3 class="text-lg font-bold mb-4">Contact</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li><i class="fas fa-map-marker-alt mr-2"></i> Riyadh, Saudi Arabia</li>
+            <li><i class="fas fa-envelope mr-2"></i> contact@digitaltwin.com</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500">
+        <p>&copy; 2025 Digital Twin | All Rights Reserved.</p>
+      </div>
+    </div>
   </footer>
 
 </body>
