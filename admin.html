@@ -9,22 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f1f5f9; /* Slate gray background */
-            color: #1f2937;
-        }
-        .logo {
-            width: 80px;
-            height: auto;
-        }
-        .header-shadow {
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-        }
-        /* Custom styles for SweetAlert2 */
-        .swal2-popup {
-            font-family: 'Poppins', sans-serif;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; color: #1f2937; }
+        .logo { width: 80px; height: auto; }
+        .header-shadow { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05); }
+        .swal2-popup { font-family: 'Poppins', sans-serif; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -35,11 +23,9 @@
                 <img src="images/digital_twin_logo_highres.png" alt="Digital Twin Logo" class="logo" />
                 <span class="text-2xl font-bold text-gray-800 hidden sm:block">Admin Panel</span>
             </div>
-            <div class="flex items-center space-x-2">
-                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-full shadow-lg transition-all flex items-center">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Home
-                </a>
-            </div>
+            <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-full shadow-lg transition-all flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </a>
         </div>
     </header>
 
@@ -48,8 +34,7 @@
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Received Project Requests</h2>
             <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 mb-6"></div>
         </div>
-        <div id="requestsList" class="space-y-6 mt-12">
-            </div>
+        <div id="requestsList" class="space-y-6 mt-12"></div>
     </main>
 
     <footer class="bg-gray-800 text-white">
@@ -59,63 +44,113 @@
     </footer>
 
     <script>
-        // --- DATA INITIALIZATION ---
+        const CURRENT_USER = 'Fahad Al-Mutairi';
+        localStorage.setItem('currentUser', CURRENT_USER);
+
         const staticRequest = {
             id: 'REQ-000',
             name: 'Ahmed Al Omari',
             email: 'Ahmad@gmail.com',
             phone: '0551234567',
             title: 'Digital Twin for Abdullah Bridge',
-            description: 'Creating a digital twin for King Abdullah Bridge for smart traffic management and structural monitoring.',
+            description: 'Creating a digital twin for King Abdullah Bridge...',
             type: 'Infrastructure Management',
             submittedAt: '28 May 2025, 04:38',
-            status: 'Pending' // Initial status
+            status: 'Pending',
+            note: null, approvedAt: null, executionNote: null, modelFileName: null, actionBy: null
         };
 
         let requests = JSON.parse(localStorage.getItem('requests')) || [];
-
-        const isStaticExists = requests.some(r => r.id === staticRequest.id);
-        if (!isStaticExists) {
+        if (!requests.some(r => r.id === staticRequest.id)) {
             requests.unshift(staticRequest);
             localStorage.setItem('requests', JSON.stringify(requests));
         }
 
         const requestsList = document.getElementById('requestsList');
 
-        // --- STATUS STYLES ---
         const statusStyles = {
             Pending: 'bg-yellow-100 text-yellow-800',
             Approved: 'bg-green-100 text-green-800',
-            Rejected: 'bg-red-100 text-red-800'
+            Rejected: 'bg-red-100 text-red-800',
+            Completed: 'bg-blue-100 text-blue-800'
         };
 
-        // --- RENDER FUNCTION ---
+        function timeAgo(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.round((now - date) / 1000);
+            if (seconds < 60) return `${seconds} sec ago`;
+            const minutes = Math.round(seconds / 60);
+            if (minutes < 60) return `${minutes} min ago`;
+            const hours = Math.round(minutes / 60);
+            if (hours < 24) return `${hours} hr ago`;
+            const days = Math.round(hours / 24);
+            return `${days} day(s) ago`;
+        }
+
         function renderRequests() {
             requestsList.innerHTML = "";
             if (requests.length === 0) {
-                requestsList.innerHTML = `
-                    <div class="text-center py-16 px-6 bg-white rounded-lg shadow-md">
-                        <i class="fas fa-inbox text-6xl text-gray-300"></i>
-                        <p class="mt-4 text-xl text-gray-500">No requests found.</p>
-                    </div>
-                `;
+                requestsList.innerHTML = `<div class="text-center py-16 px-6 bg-white rounded-lg shadow-md"><i class="fas fa-inbox text-6xl text-gray-300"></i><p class="mt-4 text-xl text-gray-500">No requests found.</p></div>`;
                 return;
             }
 
             requests.forEach(req => {
+                let cardBorderClass = '';
+                if (req.status === 'Completed') cardBorderClass = 'border-2 border-blue-500';
+                else if (req.status === 'Approved') cardBorderClass = 'border-2 border-green-500';
+                else if (req.status === 'Rejected') cardBorderClass = 'border-2 border-red-500';
+                else if (req.status === 'Pending') {
+                    if (new Date() - new Date(req.submittedAt) > 3 * 24 * 60 * 60 * 1000) {
+                        cardBorderClass = 'border-2 border-orange-500';
+                    }
+                }
+
                 const card = document.createElement('div');
-                card.className = 'bg-white shadow-lg rounded-xl overflow-hidden transform hover:-translate-y-1 transition-transform duration-300';
+                card.className = `bg-white shadow-lg rounded-xl overflow-hidden transform hover:-translate-y-1 transition-transform duration-300 ${cardBorderClass}`;
+                
+                // --- FIX: Correctly define and place the HTML for the user who took action ---
+                const actionByHtml = req.actionBy 
+                    ? `<div class="text-xs text-gray-500 italic mt-1">by ${req.actionBy}</div>` 
+                    : '';
+
+                const noteHtml = req.note ? `<div class="mt-4 p-3 bg-gray-50 rounded-lg border"><h5 class="font-bold text-gray-700">Approval Note:</h5><p class="text-gray-600 whitespace-pre-wrap">${req.note}</p></div>` : '';
+                const approvedTimeHtml = (req.status === 'Approved' && req.approvedAt) ? `<span class="text-sm text-green-600 font-semibold">(Approved ${timeAgo(req.approvedAt)})</span>` : '';
+                const completedInfoHtml = (req.status === 'Completed' && req.modelFileName) ? `<div class="mt-2 text-sm text-blue-700 font-semibold"><i class="fas fa-check-double mr-2"></i>Executed with model: ${req.modelFileName}</div>` : '';
+
+                let buttonsHtml = '';
+                switch (req.status) {
+                    case 'Approved':
+                        buttonsHtml = `<button onclick="viewDetails('${req.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center"><i class="fas fa-cogs mr-2"></i>Execute Request</button>
+                                       <button onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center"><i class="fas fa-times-circle mr-2"></i>Reject</button>`;
+                        break;
+                    case 'Rejected':
+                        buttonsHtml = `<button onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center"><i class="fas fa-check-circle mr-2"></i>Accept</button>`;
+                        break;
+                    case 'Completed':
+                        buttonsHtml = `<button onclick="viewDetails('${req.id}')" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center"><i class="fas fa-eye mr-2"></i>View Execution Details</button>`;
+                        break;
+                    default: // 'Pending'
+                        buttonsHtml = `<button onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center"><i class="fas fa-check-circle mr-2"></i>Accept</button>
+                                       <button onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center"><i class="fas fa-times-circle mr-2"></i>Reject</button>`;
+                        break;
+                }
+                
                 card.innerHTML = `
                     <div class="p-6">
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-2xl font-bold text-gray-800 mb-2">${req.title}</h3>
-                            <span class="text-sm font-semibold px-3 py-1 rounded-full ${statusStyles[req.status] || 'bg-gray-100 text-gray-800'}">
-                                ${req.status}
-                            </span>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-2xl font-bold text-gray-800">${req.title}</h3>
+                            <div class="text-right flex-shrink-0">
+                                <div class="text-sm font-semibold px-3 py-1 rounded-full ${statusStyles[req.status] || 'bg-gray-100 text-gray-800'}">${req.status}</div>
+                                ${actionByHtml}
+                            </div>
                         </div>
-                        <p class="text-blue-600 font-semibold mb-4">${req.type}</p>
+                        <p class="text-blue-600 font-semibold mb-1">${req.type}</p>
+                        ${approvedTimeHtml}
+                        ${completedInfoHtml}
                         
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
                             <div class="md:col-span-1 border-r border-gray-200 pr-6">
                                 <h4 class="font-bold text-gray-600 mb-2">Submitted By</h4>
                                 <p><i class="fas fa-user w-5 text-gray-400 mr-2"></i>${req.name}</p>
@@ -125,103 +160,82 @@
                             
                             <div class="md:col-span-2">
                                 <p class="text-gray-600 mb-4">${req.description}</p>
-                                <div class="flex justify-between items-center text-sm text-gray-500">
+                                ${noteHtml}
+                                <div class="flex justify-between items-center text-sm text-gray-500 mt-4">
                                     <span><strong>Ticket:</strong> ${req.id}</span>
                                     <span><strong>Submitted:</strong> ${req.submittedAt}</span>
                                 </div>
-                                <div class="mt-6 border-t pt-4 flex flex-wrap gap-3">
-                                    <button onclick="viewDetails('${req.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all"><i class="fas fa-eye mr-2"></i>View Details</button>
-                                    <button onclick="acceptRequest('${req.id}')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all"><i class="fas fa-check-circle mr-2"></i>Accept</button>
-                                    <button onclick="rejectRequest('${req.id}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all"><i class="fas fa-times-circle mr-2"></i>Reject</button>
-                                    <button onclick="deleteRequest('${req.id}')" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all ml-auto"><i class="fas fa-trash-alt mr-2"></i>Delete</button>
+                                <div class="mt-6 border-t pt-4 flex flex-wrap gap-3 items-center">
+                                    ${buttonsHtml}
+                                    <button onclick="deleteRequest('${req.id}')" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-semibold flex items-center ml-auto"><i class="fas fa-trash-alt mr-2"></i>Delete</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 requestsList.appendChild(card);
             });
         }
 
-        // --- ACTION FUNCTIONS ---
-        function updateRequestStatus(id, newStatus, note) {
+        function updateRequestStatus(id, newStatus, note, user) {
             const requestIndex = requests.findIndex(r => r.id === id);
             if (requestIndex > -1) {
                 requests[requestIndex].status = newStatus;
-                // You can also add the note to the request object if needed
-                // requests[requestIndex].note = note; 
+                requests[requestIndex].note = note;
+                requests[requestIndex].actionBy = user;
+                
+                if (newStatus === 'Approved') {
+                    if (!requests[requestIndex].approvedAt) {
+                         requests[requestIndex].approvedAt = new Date().toISOString();
+                    }
+                } else if (newStatus !== 'Completed') { // Don't clear 'actionBy' for completed status
+                    requests[requestIndex].approvedAt = null;
+                }
+                
                 localStorage.setItem('requests', JSON.stringify(requests));
-                renderRequests(); // Re-render to show the new status badge
+                renderRequests();
             }
         }
         
         function viewDetails(id) {
             localStorage.setItem('selectedRequestId', id);
-            window.location.href = 'visual3d.html';
+            window.location.href = 'execute-request.html';
         }
 
         function acceptRequest(id) {
-            Swal.fire({ 
-                title: 'Accept Request', 
-                input: 'text', 
-                inputLabel: 'Approval Note (optional):',
-                confirmButtonText: 'Accept',
-                confirmButtonColor: '#16a34a', // green-600
-                showCancelButton: true 
-            }).then(result => {
+            Swal.fire({ title: 'Accept Request', input: 'textarea', inputLabel: 'Approval Note (optional):', confirmButtonText: 'Accept', confirmButtonColor: '#16a34a', showCancelButton: true })
+            .then(result => {
                 if (result.isConfirmed) {
-                    const note = result.value || 'Approved';
-                    updateRequestStatus(id, 'Approved', note);
-                    Swal.fire('Approved!', `The request has been marked as approved. Note: ${note}`, 'success');
+                    const note = result.value || 'The request has been approved.';
+                    updateRequestStatus(id, 'Approved', note, CURRENT_USER);
+                    Swal.fire('Approved!', 'The request has been marked as approved.', 'success');
                 }
             });
         }
 
         function rejectRequest(id) {
-            Swal.fire({ 
-                title: 'Reject Request', 
-                input: 'text', 
-                inputLabel: 'Reason for rejection (required):', 
-                confirmButtonText: 'Reject',
-                confirmButtonColor: '#dc2626', // red-600
-                showCancelButton: true,
-                inputValidator: (value) => {
-                    if (!value) { return 'You need to provide a reason for rejection!' }
-                }
-            }).then(result => {
+            Swal.fire({ title: 'Reject Request', input: 'textarea', inputLabel: 'Reason for rejection (required):', confirmButtonText: 'Reject', confirmButtonColor: '#dc2626', showCancelButton: true, inputValidator: (value) => !value && 'You need to provide a reason!'})
+            .then(result => {
                 if (result.isConfirmed) {
-                    const reason = result.value;
-                    updateRequestStatus(id, 'Rejected', reason);
-                    Swal.fire('Rejected!', `The request has been rejected. Reason: ${reason}`, 'error');
+                    updateRequestStatus(id, 'Rejected', result.value, CURRENT_USER);
+                    Swal.fire('Rejected!', 'The request has been marked as rejected.', 'error');
                 }
             });
         }
 
         function deleteRequest(id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This will delete the request permanently!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#3b82f6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
+            Swal.fire({ title: 'Are you sure?', text: "This will delete the request permanently!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Yes, delete it!'})
+            .then((result) => {
                 if (result.isConfirmed) {
                     requests = requests.filter(r => r.id !== id);
                     localStorage.setItem('requests', JSON.stringify(requests));
-
-                    const cardElement = document.querySelector(`[data-id="${id}"]`);
-                    if (cardElement) cardElement.remove();
-                    
-                    renderRequests(); // Re-render the list
+                    renderRequests();
                     Swal.fire('Deleted!', 'The request has been deleted.', 'success');
                 }
             });
         }
 
-        // Initial render
         renderRequests();
+        setInterval(renderRequests, 60000);
     </script>
 </body>
 </html>

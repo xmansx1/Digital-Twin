@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execute Request - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; }
+        model-viewer { width: 100%; height: 400px; background-color: #e5e7eb; border-radius: 0.5rem; }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <main class="w-full max-w-7xl mx-auto py-12 px-6">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 id="page-title" class="text-3xl md:text-4xl font-bold text-gray-800">Execute Project Request</h2>
+                <p id="request-id-display" class="text-gray-500 text-lg"></p>
+            </div>
+            <a href="admin.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-full shadow-lg"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg space-y-4 h-fit">
+                <h3 class="text-xl font-bold border-b pb-2 text-gray-700">Request Details</h3>
+                <div><label class="font-semibold text-gray-500 text-sm">Project Title</label><p id="details-title" class="text-gray-800 text-lg"></p></div>
+                <div><label class="font-semibold text-gray-500 text-sm">Submitted By</label><p id="details-name" class="text-gray-800"></p></div>
+                <div><label class="font-semibold text-gray-500 text-sm">Description</label><p id="details-description" class="text-gray-600"></p></div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg space-y-6">
+                <h3 id="actions-title" class="text-xl font-bold border-b pb-2 text-gray-700">Execution Actions</h3>
+                <div>
+                    <label for="execution-notes" class="block font-semibold text-gray-600 mb-2"><i class="fas fa-pencil-alt mr-2"></i>Execution Notes</label>
+                    <textarea id="execution-notes" rows="4" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Add notes about the execution process..."></textarea>
+                </div>
+                <div id="upload-section">
+                    <label for="model-upload" class="block font-semibold text-gray-600 mb-2"><i class="fas fa-cube mr-2"></i>Upload 3D Design</label>
+                    <input type="file" id="model-upload" accept=".glb, .gltf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                    <p class="text-xs text-gray-500 mt-1">Accepted formats: .glb, .gltf (Max 3-4 MB recommended)</p>
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-600 mb-2"><i class="fas fa-eye mr-2"></i>3D Model Preview</label>
+                    <model-viewer id="viewer" src="" camera-controls auto-rotate shadow-intensity="1" alt="3D model preview"></model-viewer>
+                </div>
+                <div id="save-section" class="text-right border-t pt-6">
+                    <button id="save-execution" class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg shadow-lg"><i class="fas fa-save mr-2"></i>Complete & Save Execution</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const requestId = localStorage.getItem('selectedRequestId');
+        const requests = JSON.parse(localStorage.getItem('requests')) || [];
+        const request = requests.find(r => r.id === requestId);
+
+        if (!request) {
+            document.body.innerHTML = '<h1>Request not found.</h1>';
+            return;
+        }
+
+        // Populate details
+        document.getElementById('request-id-display').textContent = `Ticket ID: ${request.id}`;
+        document.getElementById('details-title').textContent = request.title;
+        document.getElementById('details-name').textContent = request.name;
+        document.getElementById('details-description').textContent = request.description;
+        
+        const executionNotesEl = document.getElementById('execution-notes');
+        const modelUploadInput = document.getElementById('model-upload');
+        const viewer = document.getElementById('viewer');
+
+        // --- UPDATED: Read-only mode for completed requests ---
+        if (request.status === 'Completed') {
+            document.getElementById('page-title').textContent = 'View Execution Details';
+            document.getElementById('actions-title').textContent = 'Saved Execution Details';
+            executionNotesEl.value = request.executionNote || 'No execution notes provided.';
+            executionNotesEl.disabled = true;
+
+            // Hide upload and save sections
+            document.getElementById('upload-section').style.display = 'none';
+            document.getElementById('save-section').style.display = 'none';
+
+            // --- FIX: Display the model from the saved Data URL ---
+            if (request.modelDataUrl) {
+                viewer.src = request.modelDataUrl;
+            } else {
+                viewer.alt = "Model data not found.";
+            }
+        }
+
+        modelUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.name.toLowerCase().endsWith('.glb') || file.name.toLowerCase().endsWith('.gltf')) {
+                    viewer.src = URL.createObjectURL(file);
+                } else {
+                    Swal.fire('Invalid File Type', 'Please upload a .glb or .gltf file.', 'error');
+                    modelUploadInput.value = '';
+                }
+            }
+        });
+
+        document.getElementById('save-execution').addEventListener('click', () => {
+            const executionNotes = executionNotesEl.value;
+            const modelFile = modelUploadInput.files[0];
+
+            if (!executionNotes || !modelFile) {
+                Swal.fire('Incomplete Information', 'Please add notes and upload a 3D model.', 'error');
+                return;
+            }
+            
+            // --- NEW: Convert file to Data URL using FileReader ---
+            const reader = new FileReader();
+            reader.readAsDataURL(modelFile);
+            reader.onload = () => {
+                // The result is the base64 encoded string of the file
+                const modelDataUrl = reader.result;
+
+                // Check for localStorage size limit (simple check)
+                if (modelDataUrl.length > 4.5 * 1024 * 1024) { // Approx 4.5 MB
+                     Swal.fire('File Too Large', 'The 3D model is too large to be saved in the browser. Please use a smaller file.', 'error');
+                     return;
+                }
+
+                const requestIndex = requests.findIndex(r => r.id === requestId);
+                if (requestIndex > -1) {
+                    const currentUser = localStorage.getItem('currentUser') || 'Unknown User';
+                    requests[requestIndex].status = 'Completed';
+                    requests[requestIndex].executionNote = executionNotes;
+                    requests[requestIndex].modelFileName = modelFile.name;
+                    requests[requestIndex].modelDataUrl = modelDataUrl; // Save the file data
+                    requests[requestIndex].actionBy = currentUser;
+                    localStorage.setItem('requests', JSON.stringify(requests));
+
+                    Swal.fire('Success!', 'Execution details have been saved.', 'success').then(() => {
+                        window.location.href = 'admin.html';
+                    });
+                }
+            };
+            reader.onerror = () => {
+                Swal.fire('File Read Error', 'There was an error reading the file.', 'error');
+            };
+        });
+    });
+    </script>
+</body>
+</html>
